@@ -45,8 +45,8 @@ public class FPController : MonoBehaviour
             rb.AddForce(0,300,0);
         }
         
-        float x = Input.GetAxis("Horizontal");   //input code should stay in update method, not fixedupdate
-        float z = Input.GetAxis("Vertical");
+        float x = Input.GetAxis("Horizontal")*0.3f;   //input code should stay in update method, not fixedupdate
+        float z = Input.GetAxis("Vertical")*0.3f;
         transform.position += cam.transform.forward * z + cam.transform.right * x; //new Vector3(x * speed, 0, z * speed);
 
     }
