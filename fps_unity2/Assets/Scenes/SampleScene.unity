@@ -617,3 +617,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 963194225}
+  anim: {fileID: 1340138037}

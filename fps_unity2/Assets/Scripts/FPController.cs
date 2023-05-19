@@ -5,6 +5,7 @@ using UnityEngine;
 public class FPController : MonoBehaviour
 {
     public GameObject cam; //public exposes object to inspector, drag an drop camera over there
+    public Animator anim;   //public exposes object to inspector, drag and drop animation controller over there
     float xSensitivity = 2f;
     float ySensitivity = 2f;
     float MinimumX = -90f;
@@ -45,10 +46,21 @@ public class FPController : MonoBehaviour
             rb.AddForce(0,300,0);
         }
         
-        float x = Input.GetAxis("Horizontal")*0.3f;   //input code should stay in update method, not fixedupdate
-        float z = Input.GetAxis("Vertical")*0.3f;
+        float x = Input.GetAxis("Horizontal")*0.03f;   //input code should stay in update method, not fixedupdate
+        float z = Input.GetAxis("Vertical")*0.03f;
         transform.position += cam.transform.forward * z + cam.transform.right * x; //new Vector3(x * speed, 0, z * speed);
 
+
+        if(Input.GetKeyDown(KeyCode.F)){
+            anim.SetBool("arm", !anim.GetBool("arm"));
+        }
+
+        if(Input.GetMouseButtonDown(0)){
+            anim.SetTrigger("fire");
+        }
+        if(Input.GetKeyDown(KeyCode.R)){
+            anim.SetTrigger("reload");
+        }
     }
 
         Quaternion ClampRotationAroundXAxis(Quaternion q)
