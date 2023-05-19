@@ -2,12 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FPSController : MonoBehaviour
+public class FPController : MonoBehaviour
 {
     public GameObject cam; //public exposes object to inspector, drag an drop camera over there
-    float speed = 0.2f;
     float xSensitivity = 2f;
     float ySensitivity = 2f;
+    float MinimumX = -90f;
+    float MaximumX = 90;
     Rigidbody rb;
     CapsuleCollider capsule;
 
@@ -46,8 +47,22 @@ public class FPSController : MonoBehaviour
         
         float x = Input.GetAxis("Horizontal");   //input code should stay in update method, not fixedupdate
         float z = Input.GetAxis("Vertical");
-        transform.position += new Vector3(x*speed,0,z*speed);   //these lines i've seen being used in fixedupdate()
+        transform.position += cam.transform.forward * z + cam.transform.right * x; //new Vector3(x * speed, 0, z * speed);
 
+    }
+
+        Quaternion ClampRotationAroundXAxis(Quaternion q)
+    {
+        q.x /= q.w;
+        q.y /= q.w;
+        q.z /= q.w;
+        q.w = 1.0f;
+
+        float angleX = 2.0f * Mathf.Rad2Deg * Mathf.Atan(q.x);
+        angleX = Mathf.Clamp(angleX, MinimumX, MaximumX);
+        q.x = Mathf.Tan(0.5f * Mathf.Deg2Rad * angleX);
+
+        return q;
     }
 
     bool isGrounded(){
