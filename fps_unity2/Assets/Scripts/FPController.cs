@@ -9,12 +9,26 @@ public class FPController : MonoBehaviour
     public AudioSource[] footsteps;
     public AudioSource jump;
     public AudioSource land;
+    public AudioSource ammopickup;
+    public AudioSource medpickup;
+    public AudioSource trigger; 
+    public AudioSource reload;
     float xSensitivity = 2f;
     float ySensitivity = 2f;
     float MinimumX = -90f;
     float MaximumX = 90;
     float x;
     float y;
+
+    int ammo = 0;
+    int maxAmmo = 50;
+
+    int health = 0;
+    int maxHealth = 100;
+
+    int ammoClip= 0;
+    int ammoClipMax = 10;
+
     Rigidbody rb;
     CapsuleCollider capsule;
 
@@ -30,7 +44,7 @@ public class FPController : MonoBehaviour
         cameraRot=cam.transform.localRotation;
         charachterRot=this.transform.localRotation;   //take rotations
 
-
+        health=maxHealth;
         
         
     }
@@ -64,14 +78,32 @@ public class FPController : MonoBehaviour
             anim.SetBool("arm", !anim.GetBool("arm"));
         }
         if(Input.GetMouseButtonDown(0)){
-            anim.SetTrigger("fire");
+            if(ammoClip>0){
+                anim.SetTrigger("fire");
+                ammoClip--;
+                Debug.Log("Ammo clip left = " + ammoClip);
+            }else if(anim.GetBool("arm")){
+                trigger.Play();    
+                Debug.Log("Empty Clip");            
+
+            }
+            
+
+            
             //shot.Play();
         }
         if(Input.GetKeyDown(KeyCode.R)){
-            anim.SetTrigger("reload");
+
+            if(ammo>0){
+                int ammoNeeded = ammoClipMax-ammoClip;
+                anim.SetTrigger("reload");
+                ammoClip=Mathf.Clamp(ammoClip+ammoNeeded,0,ammoClipMax);
+                reload.Play();
+            }
         }
+
         if(Mathf.Abs(x)>0||Mathf.Abs(z)>0){
-            if(!anim.GetBool("walking")){
+            if(!anim.GetBool("walking"))    {
                 anim.SetBool("walking", true);
                 InvokeRepeating("PlayFootstepsAudio", 0, 0.4f);       //invoke doesnt work
                 //PlayFootstepsAudio();   //please make invoking work
@@ -85,9 +117,32 @@ public class FPController : MonoBehaviour
 
 
 
-
-
     }
+
+        void OnCollisionEnter(Collision col) {
+            if(col.gameObject.tag=="Ammo" && ammo<maxAmmo){        //ammo  pickup
+                ammo=Mathf.Clamp(ammo+10,0,maxAmmo);//checks or makes  it so that if ammo>maxammo cant update anymore
+                Debug.Log("Ammo = "+ ammo);
+                Destroy(col.gameObject);
+                ammopickup.Play();
+                }
+
+
+
+            if(col.gameObject.tag=="MedBox" && health<maxHealth){                   //med health pickup
+                health = Mathf.Clamp(health+20,0,maxHealth);
+                Debug.Log("health = "+ health);
+                Destroy(col.gameObject);
+                medpickup.Play();
+                }
+
+            if(col.gameObject.tag=="Lava"){
+                health=Mathf.Clamp(health-50,0,maxHealth);
+                Debug.Log("Lava, health is " + health);
+            }
+
+            
+        }
 
         void PlayFootstepsAudio(){
             AudioSource audioSource = new AudioSource();
